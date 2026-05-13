@@ -21,3 +21,11 @@ Thumbs.db
 ~$*.docx
 ~$*.pptx
 ~$*.xlsx
+
+# QM9 原始与 PyG 缓存（体积大；本地运行 `python data.py` 自动下载）
+data/qm9/
+
+# 成员 A 等脚本生成的大文件（本地按 README 顺序复现）
+outputs/features/
+outputs/figures/
+

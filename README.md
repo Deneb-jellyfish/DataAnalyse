@@ -12,10 +12,11 @@
 
 本项目使用 **PyTorch Geometric** 自带的数据集封装，运行时会自动下载 QM9 并缓存到本地目录。
 
-1) 安装依赖（示例）
+1) 安装依赖（推荐，与成员 A 脚本一致）
 ```bash
-pip install torch torch-geometric rdkit-pypi scikit-learn matplotlib seaborn
+pip install -r requirements.txt
 ```
+若需指定 PyTorch 版本或 GPU 轮子，请先按 [PyTorch 官网](https://pytorch.org/get-started/locally/) 安装 `torch`，再执行 `pip install -r requirements.txt`（可跳过文件中已满足的 `torch` 行）。
 
 2) 一行代码下载并验证（项目已提供示例脚本）
 ```bash
@@ -29,8 +30,19 @@ python data.py
 - 数据下载与读取示例：`data.py`
 - 运行后应能打印数据条数，以及一条样本的图结构信息（节点特征、边、标签等）。
 
+### 成员 A：脚本建议执行顺序（自仓库根目录）
+
+1. `python data.py` — 拉取/校验 PyG QM9  
+2. `python src/eda_qm9.py` — 四张 EDA 图 + `outputs/reports/eda_notes.md`  
+3. `python src/fingerprints.py` — Morgan 指纹与 `X_train.npy` / `X_test.npy` 等  
+4. `python src/cluster_kmeans.py` — KMeans(k=5)、聚类图与 `cluster_labels.npy`  
+5. `python src/demo_molecules.py` — `demo_mols.png`（若已有 `outputs/features/predictions.csv` 则使用真实预测，否则用占位噪声便于联调）
+
+说明：`outputs/features/` 与 `outputs/figures/` 已在 `.gitignore` 中排除（体积大），克隆仓库后需按上述顺序在本地重新生成。
+
 ## 目录结构（当前仓库）
 
+- `requirements.txt`：成员 A 流水线主要 Python 依赖（含 PyG / RDKit）
 - `data.py`：QM9 数据集下载/读取示例（基于 `torch_geometric.datasets.QM9`）
 - `项目说明书_分子性质预测_v2.docx`：项目说明书（更详细的背景、流程与分工）
 - `package.json` / `package-lock.json`：用于处理 docx 的 Node 依赖（如需）
