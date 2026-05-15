@@ -1,15 +1,27 @@
+from __future__ import annotations
+
 from pathlib import Path
+import sys
 
 import numpy as np
 import pandas as pd
-from rdkit import Chem, DataStructs
+from rdkit import Chem, DataStructs, RDLogger
 from rdkit.Chem import AllChem
 from sklearn.model_selection import train_test_split
+
+_SRC = Path(__file__).resolve().parent
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+from qm9_raw_utils import load_qm9_skip_sdf_indices
 
 
 def mol_to_morgan_bits(mol: Chem.Mol | None, n_bits: int = 2048, radius: int = 2) -> np.ndarray:
     if mol is None:
         return np.zeros(n_bits, dtype=np.uint8)
+
+    # sanitize=False 与 PyG 对齐时，需先感知环系，否则 Morgan 会报 RingInfo not initialized
+    mol.UpdatePropertyCache(strict=False)
+    Chem.GetSSSR(mol)
 
     bit_vector = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=n_bits)
     arr = np.zeros((n_bits,), dtype=np.uint8)
@@ -33,7 +45,11 @@ def main() -> None:
     y_all = label_df["mu"].to_numpy(dtype=np.float32)
     mol_id_all = label_df["mol_id"].astype(str).to_list()
 
-    supplier = Chem.SDMolSupplier(str(sdf_path), removeHs=False, sanitize=True)
+    skip_sdf = load_qm9_skip_sdf_indices(raw_dir / "uncharacterized.txt")
+
+    # 与 PyG QM9 一致使用 sanitize=False，否则约 1403 条在 PyG 中存在但 strict sanitize 失败，条数会对不齐。
+    RDLogger.DisableLog("rdApp.*")
+    supplier = Chem.SDMolSupplier(str(sdf_path), removeHs=False, sanitize=False)
     x_rows = []
     smiles_all = []
     valid_indices = []
@@ -41,6 +57,8 @@ def main() -> None:
     for idx, mol in enumerate(supplier):
         if idx >= len(y_all):
             break
+        if idx in skip_sdf:
+            continue
         if mol is None:
             continue
 
@@ -92,7 +110,7 @@ def main() -> None:
         "# Feature Export Notes",
         "",
         "- Morgan fingerprint: radius=2, n_bits=2048。",
-        "- 指纹来源: `data/qm9/raw/gdb9.sdf`（与 `gdb9.sdf.csv` 的 `mu` 标签对齐）。",
+        "- 指纹来源: `data/qm9/raw/gdb9.sdf` + `uncharacterized.txt` 跳过列表，与 **PyG `QM9` 条数一致**（约 130,831）；SDF 读取使用 `sanitize=False`（与 PyG 一致）。",
         "- 数据切分: train/test = 8:2，random_state=42。",
         "- `split_index.csv` 提供 index/source_index/mol_id/split/smiles/dipole 对齐信息。",
         "- 聚类与随机森林建议使用 `X_all.npy` 或 `X_train.npy` 视任务而定。",

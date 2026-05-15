@@ -25,6 +25,8 @@ python data.py
 
 默认会把数据下载到 `./data/qm9/`（如需更换位置，可修改 `data.py` 中的 `root` 参数）。
 
+`data/qm9/raw/uncharacterized.txt` 须为官方内容（PyG 首次下载会写入）。若为占位文件，`src/fingerprints.py` 会报错并提示重新下载，以保证与 PyG `QM9` 的 **130,831** 条样本一致。
+
 ## 快速开始
 
 - 数据下载与读取示例：`data.py`
@@ -38,7 +40,9 @@ python data.py
 4. `python src/cluster_kmeans.py` — KMeans(k=5)、聚类图与 `cluster_labels.npy`  
 5. `python src/demo_molecules.py` — `demo_mols.png`（若已有 `outputs/features/predictions.csv` 则使用真实预测，否则用占位噪声便于联调）
 
-说明：`outputs/features/` 与 `outputs/figures/` 已在 `.gitignore` 中排除（体积大），克隆仓库后需按上述顺序在本地重新生成。
+说明：`.gitignore` 仅排除在本机实测常 **大于 100MB** 的少数路径（Git 本身不支持按字节大小通配）；`gdb9.sdf`、PyG 缓存 `*.pt`、全量/训练集指纹矩阵等需本地用 `data.py` / `fingerprints.py` 生成。其余图表、小 `.npy`、`split_index.csv` 等可纳入版本库。
+
+对齐自检（需已安装依赖与 raw 数据）：`python scripts/verify_qm9_alignment.py` — 比对 PyG `len(QM9)`、RDKit 枚举条数，以及（若已导出）`X_all.npy` / `split_index.csv` 行数。
 
 ## 目录结构（当前仓库）
 

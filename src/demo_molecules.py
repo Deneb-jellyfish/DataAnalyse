@@ -1,9 +1,15 @@
 from pathlib import Path
+import sys
 
 import numpy as np
 import pandas as pd
-from rdkit import Chem
+from rdkit import Chem, RDLogger
 from rdkit.Chem import Draw
+
+_SRC = Path(__file__).resolve().parent
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+from qm9_raw_utils import load_qm9_skip_sdf_indices
 
 
 def load_predictions(pred_path: Path, y_true: np.ndarray) -> tuple[np.ndarray, str]:
@@ -39,12 +45,17 @@ def main() -> None:
     y_true = label_df["mu"].to_numpy(dtype=np.float32)
     mol_ids = label_df["mol_id"].astype(str).to_numpy()
 
-    supplier = Chem.SDMolSupplier(str(raw_dir / "gdb9.sdf"), removeHs=False, sanitize=True)
+    skip_sdf = load_qm9_skip_sdf_indices(raw_dir / "uncharacterized.txt")
+
+    RDLogger.DisableLog("rdApp.*")
+    supplier = Chem.SDMolSupplier(str(raw_dir / "gdb9.sdf"), removeHs=False, sanitize=False)
     mols = []
     valid_indices = []
     for idx, mol in enumerate(supplier):
         if idx >= len(y_true):
             break
+        if idx in skip_sdf:
+            continue
         if mol is None:
             continue
         mols.append(mol)
