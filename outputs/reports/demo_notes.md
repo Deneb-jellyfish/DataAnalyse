@@ -8,9 +8,7 @@
 
 ## 预测值来源
 
-1. **优先**: 若存在 `outputs/features/predictions.csv`，脚本会读取其中的预测列：
-   - 列名可为 `pred` 或 `prediction`
-   - 行数需不少于当前可对齐样本数，且**行顺序与指纹/标签导出时的有效分子顺序一致**（与 `split_index.csv` 中按 `index` 排序后的全量顺序一致；如有疑问请与成员 A 对齐索引方案）。
+1. **优先**: 若存在 `outputs/features/predictions.csv`，正式预测结果应读取其中的 `y_pred_physics` 列，并用 `dataset_index` 与 `split_index.csv` 对齐。
 2. **占位**: 若文件不存在，则使用基于真值加高斯噪声的**合成预测**，仅用于版式与流程演示；正式答辩前应替换为成员 B 的真实 `predictions.csv` 后重新运行：
 
 ```bash
