@@ -1,0 +1,2 @@
+model,n_estimators,random_state,train_size,test_size,mse,rmse,mae
+random_forest,100,42,104664,26167,0.6029194593429565,0.7764788866043091,0.5228472352027893

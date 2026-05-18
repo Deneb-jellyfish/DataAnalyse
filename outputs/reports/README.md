@@ -1,4 +1,4 @@
-# outputs/reports 说明（成员A 产出索引）
+# outputs/reports 说明（A/B/C 报告索引）
 
 本目录存放**可直接写入课程报告**的文字结论、统计表与脚本导出的 CSV。图表文件在 `outputs/figures/` 下，特征与标签在 `outputs/features/` 下。
 
@@ -16,6 +16,10 @@
 | `gnn_notes.md` | 成员 B 的 GNN 模型、训练命令、预测输出与指标汇总 |
 | `cluster_notes.md` | KMeans/PCA 方法说明 + 各簇偶极矩数值表 + 箱线图排版说明 |
 | `demo_notes.md` | 分子 Demo 图生成逻辑、`predictions.csv` 预测对齐说明 |
+| `rf_baseline_notes.md` | 成员 C 的随机森林 baseline 配置与测试集指标 |
+| `experiment_results.md` | 三组模型总表（RF / Base GNN / Physics GNN）与总体结论 |
+| `cluster_error_analysis.md` | 按簇分组的模型误差分析与文字结论 |
+| `member_c_handoff.md` | 给成员 D 的结果整合说明、推荐图表与写作建议 |
 
 ## 复现命令（conda 环境 `da`）
 
@@ -32,5 +36,16 @@ python src/train.py
 python src/train_physics.py
 python src/predict.py
 python src/cluster_kmeans.py
+python src/train_rf.py
+python src/member_c_analysis.py
 python src/demo_molecules.py
 ```
+
+## 当前推荐引用顺序
+
+给成员 D 写报告时，建议优先看：
+
+1. `experiment_results.md`：总指标表与模型对比结论  
+2. `cluster_error_analysis.md`：聚类误差分析结论  
+3. `member_c_handoff.md`：可直接落地到报告的写作提示  
+4. `demo_notes.md`：Demo 图的使用方式与解释重点

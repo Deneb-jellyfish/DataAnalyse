@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 
 import numpy as np
 import pandas as pd
 from rdkit import Chem, DataStructs, RDLogger
 from rdkit.Chem import AllChem
 from sklearn.model_selection import train_test_split
+
+_SRC = Path(__file__).resolve().parent
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+from qm9_raw_utils import load_qm9_skip_sdf_indices
 
 
 def load_qm9_skip_sdf_indices(path: Path) -> set[int]:

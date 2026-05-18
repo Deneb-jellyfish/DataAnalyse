@@ -30,4 +30,5 @@ outputs/features/*
 !outputs/features/split_index.csv
 !outputs/features/predictions.csv
 outputs/figures/
+outputs/models/
 
